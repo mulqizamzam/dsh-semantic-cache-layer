@@ -11,9 +11,9 @@
 
 ## Recent installation failure and fix
 
-A running DSH UI reported the main `dsh-semantic-cache-layer` component as `Not running` while the separate Skill filesystem provider was running. Code inspection found that the plugin registered unsupported raw output JSON schemas through `@deepseek-ai/dsh-tools`: type arrays (for example `type: ['string', 'null']`) and nested property-level `required: true`. The DSH v0.2.1-rc.2 JSON Schema contract supports a single type per node, nullable unions with `oneOf`, and a `required: string[]` at the object node. Schema validation can throw during `apply()`, preventing plugin startup.
+A running DSH UI reported the main `dsh-semantic-cache-layer` component as `Not running` while the separate Skill filesystem provider was running. The first fix incorrectly treated `output.schema` as raw JSON Schema: although the compiled JSON Schema can contain `required: string[]`, the author-facing `@deepseek-ai/dsh-tools` value-schema DSL rejects a root-level `schema.required`. For output properties, the DSL requires `required: true` on each property; the compiler then lifts those flags into the compiled JSON Schema. Output `oneOf` branches must not declare `type` on the same node, nullable unions use `oneOf`, and object nodes must explicitly set `additionalProperties: true` or `false`. These validation errors can occur during `defineTool()`/plugin loading and prevent startup.
 
-The runtime now uses supported JSON Schema shapes; the unit-test `defineTool` fixture validates those schema constraints so this failure class is detected before merge. The package also declares direct DSH runtime dependencies in both peerDependencies and devDependencies, following the DSH plugin-install contract.
+The runtime now uses the DSH author-facing value-schema DSL correctly: each output property declares `required: true`, nullable values use `oneOf`, and object nodes explicitly declare `additionalProperties`. The unit-test `defineTool` fixture validates these author-schema rules so this failure class is detected before merge. The package also declares direct DSH runtime dependencies in both peerDependencies and devDependencies, following the DSH plugin-install contract.
 
 ## Verified results
 
