@@ -3,26 +3,32 @@
 ## Release metadata
 
 - Package: `dsh-semantic-cache-layer`
-- Candidate version: `0.2.1-rc.2`
+- Package version: `0.2.1-rc.2`
 - Host compatibility target: DeepSeek Harness `0.2.1-rc.2`
-- Suggested GitHub Description: `Native DSH semantic response cache with cosine similarity, optional embeddings, and safe cache diagnostics.`
 - Repository: public `mulqizamzam/dsh-semantic-cache-layer`
-- Package type: native DSH Cordis plugin with a DSH Skill provider; no MCP server is bundled.
+- Source intended for this install: `github:mulqizamzam/dsh-semantic-cache-layer#main`
+- Suggested GitHub Description: `Native DSH semantic response cache with cosine similarity, optional embeddings, and safe cache diagnostics.`
+
+## Recent installation failure and fix
+
+A running DSH UI reported the main `dsh-semantic-cache-layer` component as `Not running` while the separate Skill filesystem provider was running. Code inspection found that the plugin registered unsupported raw output JSON schemas through `@deepseek-ai/dsh-tools`: type arrays (for example `type: ['string', 'null']`) and nested property-level `required: true`. The DSH v0.2.1-rc.2 JSON Schema contract supports a single type per node, nullable unions with `oneOf`, and a `required: string[]` at the object node. Schema validation can throw during `apply()`, preventing plugin startup.
+
+The runtime now uses supported JSON Schema shapes; the unit-test `defineTool` fixture validates those schema constraints so this failure class is detected before merge. The package also declares direct DSH runtime dependencies in both peerDependencies and devDependencies, following the DSH plugin-install contract.
 
 ## Verified results
 
-- Latest release-candidate test workflow passed on Node.js `22.19.0`: package metadata/tree validation, unit tests, JavaScript syntax checks, and `npm pack --dry-run`.
-- Release tag workflow passed and the annotated remote tag `v0.2.1-rc.2` was verified at commit `4952a8825bf4e99a5f4f04b92f991a9057867d77`.
-- The runtime warning call discovered by CI was corrected; the remote runtime source blob now matches the checked local source.
-- GitHub branch `main` contains the plugin entry point, DSH runtime, semantic cache, tests, Skill, configuration, docs, icon, license and CI workflow.
-- Source conversion and public-boundary decisions are documented in `docs/workflow-disposition.md`.
+- CI on the source commit before the documentation follow-ups passed on Node.js `22.19.0`: package verification, unit tests, syntax checks, and `npm pack --dry-run`.
+- The post-fix unit suite includes schema-compatibility checks in addition to cache, middleware bypass, embeddings, and tool behavior tests.
+- The source branch `main` contains the patched plugin runtime and updated docs.
+- The already-published Git tag `v0.2.1-rc.2` still points to the original tagged commit, which predates this schema fix. Installs pinned to `#main` should update their branch checkout/profile lockfile to receive the fix; do not assume the old tag contains it.
 
 ## Remaining checks and limitations
 
-- No live DSH `0.2.1-rc.2` process was available for installation/end-to-end middleware testing. Follow `docs/integration-smoke-test.md` on the target runtime.
-- The execution container could not resolve `github.com`, so branch files were committed through the authenticated GitHub API and the annotated release tag was created with a guarded GitHub Actions workflow.
-- The GitHub repository Description field could not be updated through the available connector. Suggested value: `Native DSH semantic response cache with cosine similarity, optional embeddings, and safe cache diagnostics.`
+- The user must update/reinstall the branch-based bundle in their actual profile and restart DSH to confirm the component changes from `Not running` to running.
+- No direct access to the user's runtime startup log is available in this task. If it remains stopped after update, inspect DSH startup logs and share the error around the plugin load.
+- No live session was available here for an end-to-end DSH installation smoke test; see `docs/integration-smoke-test.md`.
+- The repository Description field may still need updating in GitHub settings: `Native DSH semantic response cache with cosine similarity, optional embeddings, and safe cache diagnostics.`
 
 ## Status boundary
 
-Repository source and the annotated `v0.2.1-rc.2` tag are published to GitHub. CI unit/packaging verification passed on the latest release-tag commit. Live DSH end-to-end integration and repository Description-field update remain outstanding.
+The schema-startup defect was identified and fixed on `main`, and regression tests were added. Passing repository CI validates the package-level schema constraints; the final confirmation is the user's DSH profile loading the new main-branch commit successfully.
