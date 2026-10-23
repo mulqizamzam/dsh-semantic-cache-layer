@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Semantic cache layer icon">
+  <rect width="128" height="128" rx="26" fill="#102A43"/>
+  <circle cx="34" cy="36" r="11" fill="#70D6C0"/>
+  <circle cx="94" cy="36" r="11" fill="#70D6C0"/>
+  <circle cx="64" cy="92" r="11" fill="#70D6C0"/>
+  <path d="M44 38H84M40 46L57 81M88 46L71 81" fill="none" stroke="#F3F7FA" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="11" fill="#F3F7FA"/>
+  <circle cx="64" cy="64" r="4" fill="#102A43"/>
+</svg>
