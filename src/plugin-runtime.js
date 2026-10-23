@@ -230,7 +230,7 @@ export function installSemanticCachePlugin(ctx, rawConfig = {}, defineTool) {
         const now = Date.now()
         if (now - lastWarningAt > 30000) {
           lastWarningAt = now
-          ctx.logger?.warn?.(`dsh-semantic-cache-layer: embedding unavailable; passing request through unchanged (${String(error?.message ?? error))})`
+          ctx.logger?.warn?.(`dsh-semantic-cache-layer: embedding unavailable; passing request through unchanged (${String(error?.message ?? error)})`
         }
         yield* next()
         return
