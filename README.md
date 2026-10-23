@@ -61,6 +61,16 @@ Choose the profile that you actually use. The examples use `web`.
 
 If your installation command or plugin manager reports dependency/build-script prompts, review them before approval. Add the plugin separately to every profile where you need it.
 
+### Update an existing GitHub-branch install
+
+Because `github:mulqizamzam/dsh-semantic-cache-layer#main` tracks the branch, an existing installation may still have an older commit pinned in its profile lockfile. After a source fix is committed, update the package in the same profile and restart DSH:
+
+```bash
+dsh plugin --profile web update dsh-semantic-cache-layer
+```
+
+Replace `web` with the profile you actually use. Then verify the merged configuration and startup logs. The package version string may remain the same when a fix is committed to the same release-candidate branch; the resolved source commit must still update.
+
 ## Enable automatic semantic caching
 
 Automatic caching is conservative and should be opt-in after a privacy and correctness review. Edit the `dsh-semantic-cache-layer` config in the profile/bundle patch with the fields below. The bundled defaults are in [`cordis.patch.yml`](cordis.patch.yml).
