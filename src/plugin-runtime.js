@@ -154,7 +154,12 @@ function extractCacheableText(chunks) {
 }
 
 function schema(properties) {
-  return { type: 'object', additionalProperties: false, properties: Object.fromEntries(Object.entries(properties).map(([key, value]) => [key, { ...value, required: true }])) }
+  return {
+    type: 'object',
+    additionalProperties: false,
+    properties,
+    required: Object.keys(properties),
+  }
 }
 
 function registerTools(ctx, cache, counters, defineTool, config) {
@@ -165,7 +170,7 @@ function registerTools(ctx, cache, counters, defineTool, config) {
       embedding: { type: 'array', items: { type: 'number' }, required: true, description: 'Numeric vector to compare with stored vectors.' },
       namespace: { type: 'string', description: 'Cache namespace; defaults to manual.' },
     },
-    output: { schema: schema({ hit: { type: 'boolean' }, response: { type: ['string', 'null'] }, score: { type: ['number', 'null'] }, reason: { type: 'string' } }), render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }] },
+    output: { schema: schema({ hit: { type: 'boolean' }, response: { oneOf: [{ type: 'string' }, { type: 'null' }] }, score: { oneOf: [{ type: 'number' }, { type: 'null' }] }, reason: { type: 'string' } }), render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }] },
     async execute(args) { return cache.lookup(args.embedding, { namespace: args.namespace ?? 'manual' }) },
   }))
 
