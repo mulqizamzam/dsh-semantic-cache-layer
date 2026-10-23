@@ -21,8 +21,8 @@ The cache is process-local, bounded, and volatile. Entries and counters reset wh
 
 ## Safe debugging
 
-- Run `dsh_scl_stats` to see ntry counts, hits, stores, evictions, expirations, embedding failures, and skips. Counters are process-local.
-- A thit is returned only when cosine similarity meets the configured threshold and the provider/model/embedding-model namespace matches.
+- Run `dsh_scl_stats` to see entry counts, hits, stores, evictions, expirations, embedding failures, and skips. Counters are process-local.
+- A hit is returned only when cosine similarity meets the configured threshold and the provider/model/embedding-model namespace matches.
 - Lowering the threshold can increase false semantic matches. Raise it for conservative reuse; verify expected outputs with representative prompts.
 - `dsh_scl_lookup` and `dsh_scl_store` operate on supplied vectors only; they do not fetch embeddings or read files.
 - `dsh_scl_clear` mutates cache state and requires the literal `confirm="clear"`. Omit `namespace` only when you intend to clear all namespaces for this process.
