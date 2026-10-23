@@ -6,24 +6,23 @@
 - Candidate version: `0.2.1-rc.2`
 - Host compatibility target: DeepSeek Harness `0.2.1-rc.2`
 - Suggested GitHub Description: `Native DSH semantic response cache with cosine similarity, optional embeddings, and safe cache diagnostics.`
-- Visibility target: public
+- Repository: public `mulqizamzam/dsh-semantic-cache-layer`
 - Package type: native DSH Cordis plugin with a DSH Skill provider; no MCP server is bundled.
 
-## Completed local gates
+## Completed verification
 
-- Unit tests via Node's built-in `node --test`.
-- Syntax checks for the entry point and runtime source.
-- Metadata, package file tree, Skill front matter, and square icon checks via `scripts/verify-package.mjs`.
-- `npm pack --dry-run` archive inventory.
-- Source-conversion disposition and limitation documentation.
+- CI run with Node.js `22.19.0`: package metadata/tree validation, unit tests, JavaScript syntax checks, and `npm pack --dry-run` passed.
+- The runtime file uploaded to GitHub was corrected after CI caught a malformed logging call; later workflow runs should be treated as authoritative for the current head.
+- GitHub branch `main` contains the plugin entry point, DSH runtime, semantic cache, tests, Skill, configuration, docs, icon, license and CI workflow.
+- Source conversion and public-boundary decisions are documented in `docs/workflow-disposition.md`.
 
-## External / unavailable gates
+## Remaining checks
 
-- The execution environment supplied Node.js `22.16.0`, below DSH's required `^22.19.0 || >=24.0.0`. Tests passed but were not run with an engine version satisfying the target minimum.
 - No live DSH `0.2.1-rc.2` process was available for installation/end-to-end middleware testing. Follow `docs/integration-smoke-test.md` on the target runtime.
-- The GitHub repository now exists and is public, and the connected account has push permission. The execution container cannot resolve `github.com`, so Git transport push is unavailable. Files are being committed through the authenticated GitHub API; verify the final branch and tag before declaring publication complete.
-- No GitHub tag/release creation tool is exposed through the connected action surface. The local annotated tag exists in the supplied Git bundle; a remote tag/release needs an available Git transport or tag/release-capable API.
+- The Git transport from the execution container cannot resolve `github.com`; the branch files were committed through the authenticated GitHub API instead.
+- The remote release-candidate tag is being created by the guarded GitHub Actions workflow on this commit. Verify the tag and workflow result before claiming tag publication.
+- The repository's GitHub Description field could not be changed using the available connector. The suggested description above is ready to apply in repository settings.
 
-## Release status boundary
+## Status boundary
 
-Local package and unit-test gates passed. This record does not claim a live DSH smoke test or GitHub release/tag until those steps are executed and verified.
+Local package and unit-test gates passed, and GitHub CI has provided a passing result for an earlier source commit. Live DSH integration, remote tag verification, and the repository Description field remain separate gates.
