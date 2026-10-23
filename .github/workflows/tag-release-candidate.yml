@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   tag:
-    if: github.event.head_commit.message == 'release: create v0.2.1-rc.2 tag'
+    if: "${{ github.event.head_commit.message == 'release: create v0.2.1-rc.2 tag' }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
