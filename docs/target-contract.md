@@ -15,7 +15,7 @@ The plugin targets the `dsh-v0.2.1-rc.2` release contract rather than assuming a
 - [DSH v0.2.1-rc.2 `package.json`](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/package.json) — version and Node.js target (`^22.19.0 || >=24.0.0`).
 - [LLM streaming contract](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/docs/subsystems/llm-streaming.md) — `llm/stream` waterfall contract.
 - [GenerateOptions and StreamChunk types](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/packages/llm/llm/src/types.ts) — request fields and chunk unions.
-- [LLN adapter guide](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/docs/user/develop/practice/llm-adapter.md) — text block and finish chunk examples.
+- [LLM adapter guide](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/docs/user/develop/practice/llm-adapter.md) — text block and finish chunk examples.
 - [DSH context-mode bundle pattern](https://github.com/mulqizamzam/dsh-context-mode/blob/main/cordis.patch.yml) — Skill filesystem provider wiring.
 
 ## Compatibility limits
