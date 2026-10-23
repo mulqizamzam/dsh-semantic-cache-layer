@@ -1,0 +1,60 @@
+{
+  "name": "dsh-semantic-cache-layer",
+  "version": "0.2.1-rc.2",
+  "description": "A native DeepSeek Harness semantic-response cache with cosine similarity, bounded in-memory storage, and safe opt-in embeddings.",
+  "type": "module",
+  "main": "./index.js",
+  "files": [
+    "index.js",
+    "src/",
+    "cordis.patch.yml",
+    "skills/",
+    "icon.svg",
+    "README.md",
+    "README.en.md",
+    "NOTICE.md",
+    "LICENSE",
+    "docs/"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check index.js && node --check src/semantic-cache.js && node --check src/plugin-runtime.js && node scripts/verify-package.mjs",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0",
+    "dsh": "0.2.1-rc.2"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-skill-filesystem": "0.2.1-rc.2"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-skill-filesystem": "0.2.1-rc.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mulqizamzam/dsh-semantic-cache-layer.git"
+  },
+  "homepage": "https://github.com/mulqizamzam/dsh-semantic-cache-layer#readme",
+  "bugs": {
+    "url": "https://github.com/mulqizamzam/dsh-semantic-cache-layer/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "semantic-cache",
+    "cosine-similarity",
+    "llm-cache",
+    "developer-productivity"
+  ],
+  "icon": "./icon.svg"
+}
