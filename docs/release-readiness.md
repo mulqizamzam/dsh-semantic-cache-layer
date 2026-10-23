@@ -11,18 +11,18 @@
 
 ## Completed verification
 
-- CI run with Node.js `22.19.0`: package metadata/tree validation, unit tests, JavaScript syntax checks, and `npm pack --dry-run` passed.
-- The runtime file uploaded to GitHub was corrected after CI caught a malformed logging call; later workflow runs should be treated as authoritative for the current head.
+- GitHub Actions run 4 on Node.js `22.19.0` passed: package metadata/tree validation, all unit tests, JavaScript syntax checks, and `npm pack --dry-run`.
+- The runtime file uploaded to GitHub was corrected after CI caught a malformed logging call; the fix now matches the local runtime source blob hash.
 - GitHub branch `main` contains the plugin entry point, DSH runtime, semantic cache, tests, Skill, configuration, docs, icon, license and CI workflow.
 - Source conversion and public-boundary decisions are documented in `docs/workflow-disposition.md`.
 
 ## Remaining checks
 
 - No live DSH `0.2.1-rc.2` process was available for installation/end-to-end middleware testing. Follow `docs/integration-smoke-test.md` on the target runtime.
-- The Git transport from the execution container cannot resolve `github.com`; the branch files were committed through the authenticated GitHub API instead.
-- The remote release-candidate tag is being created by the guarded GitHub Actions workflow on this commit. Verify the tag and workflow result before claiming tag publication.
+- The execution container cannot resolve `github.com`; the branch files were committed through the authenticated GitHub API, and CI confirmed it can fetch and test the remote repository.
+- The guarded `.github/workflows/tag-release-candidate.yml` workflow creates the remote `v0.2.1-rc.2` tag only when the head commit message is exactly `release: create v0.2.1-rc.2 tag`; it refuses to rewrite an existing tag. Verify the Actions run and tag ref before claiming publication.
 - The repository's GitHub Description field could not be changed using the available connector. The suggested description above is ready to apply in repository settings.
 
 ## Status boundary
 
-Local package and unit-test gates passed, and GitHub CI has provided a passing result for an earlier source commit. Live DSH integration, remote tag verification, and the repository Description field remain separate gates.
+Remote unit/packaging CI passed on Node.js `22.19.0`. Live DSH integration, remote tag verification, and the repository Description field remain separate gates.
