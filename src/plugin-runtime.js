@@ -157,8 +157,7 @@ function schema(properties) {
   return {
     type: 'object',
     additionalProperties: false,
-    properties,
-    required: Object.keys(properties),
+    properties: Object.fromEntries(Object.entries(properties).map(([name, property]) => [name, { ...property, required: true }])),
   }
 }
 
@@ -191,7 +190,7 @@ function registerTools(ctx, cache, counters, defineTool, config) {
     name: 'dsh_scl_stats',
     description: 'Show semantic cache counts for the current DSH process. Entries and counters reset when that process restarts.',
     parameters: {},
-    output: { schema: schema({ stats: { type: 'object' }, automaticCachingEnabled: { type: 'boolean' }, embeddingConfigured: { type: 'boolean' }, embeddingRequests: { type: 'number' }, embeddingFailures: { type: 'number' }, automaticCacheSkips: { type: 'number' } }), render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }] },
+    output: { schema: schema({ stats: { type: 'object', additionalProperties: true }, automaticCachingEnabled: { type: 'boolean' }, embeddingConfigured: { type: 'boolean' }, embeddingRequests: { type: 'number' }, embeddingFailures: { type: 'number' }, automaticCacheSkips: { type: 'number' } }), render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }] },
     async execute() { return { stats: cache.stats(), automaticCachingEnabled: config.enabled && config.autoCache && Boolean(config.embeddingEndpoint.trim()), embeddingConfigured: Boolean(config.embeddingEndpoint.trim()), embeddingRequests: counters.embeddingRequests, embeddingFailures: counters.embeddingFailures, automaticCacheSkips: counters.automaticCacheSkips } },
   }))
 
