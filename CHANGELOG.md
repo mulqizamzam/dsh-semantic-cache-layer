@@ -2,7 +2,7 @@
 
 ## 0.2.1-rc.2
 
-- Fix DSH tool-output schemas to use supported single-type JSON Schema nodes, `oneOf` nullable values, and an object-level `required` list; add a regression test for the target runtime schema contract.
+- Fix DSH tool-output schemas to use the value-schema DSL: mark each output property with `required: true`, use `oneOf` for nullable values, and explicitly declare object `additionalProperties`; add regression coverage.
 
 - Initial DSH-native port of the semantic cache concept.
 - Add DSH `llm/stream` middleware with explicit opt-in embedding endpoint, conservative text-only response eligibility, route/system/generation-setting isolation, and fail-open embedding errors.
