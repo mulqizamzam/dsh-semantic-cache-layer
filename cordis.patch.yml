@@ -1,0 +1,26 @@
+# DeepSeek Harness 0.2.1-rc.2 bundle. Automatic semantic caching is opt-in
+# until an embeddings endpoint is explicitly configured.
+- insert:
+    - id: dsh-semantic-cache-layer
+      name: dsh-semantic-cache-layer
+      config:
+        enabled: true
+        autoCache: true
+        threshold: 0.94
+        maxEntries: 500
+        ttlMs: 900000
+        embeddingEndpoint: ""
+        embeddingModel: text-embedding-3-small
+        embeddingApiKeyEnv: OPENAI_API_KEY
+        requestTimeoutMs: 4000
+        maxInputChars: 24000
+        namespace: default
+
+    - id: dsh-semantic-cache-layer-skills
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        providerName: dsh-semantic-cache-layer
+        includeDefaultRoots: false
+        customSkillDirs:
+          - !!js "process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('dsh-semantic-cache-layer/package.json')), 'skills')"
+        watch: true
