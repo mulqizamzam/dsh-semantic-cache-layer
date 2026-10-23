@@ -13,24 +13,37 @@ function fakeContext() {
     tools: { register(tool) { tools.push(tool) } },
   }
 }
-function assertSupportedJsonSchema(schema, path = 'schema') {
-  const allowed = new Set(['type', 'oneOf', 'properties', 'required', 'additionalProperties', 'items', 'enum', 'const', 'description', 'title', 'default', 'examples'])
-  for (const key of Object.keys(schema)) assert.ok(allowed.has(key), `${path}.${key} is not supported`)
+function assertSupportedValueSchema(schema, path = 'schema', allowRequired = false) {
+  assert.ok(schema && typeof schema === 'object' && !Array.isArray(schema), `${path} must be a schema object`)
+  const allowed = new Set([
+    'type', 'oneOf', 'properties', 'additionalProperties', 'items', 'enum', 'const',
+    'description', 'title', 'default', 'examples',
+    ...(allowRequired ? ['required'] : []),
+  ])
+  for (const key of Object.keys(schema)) assert.ok(allowed.has(key), `${path}.${key} is not supported by the value schema DSL`)
+  if (schema.required !== undefined) assert.equal(schema.required, true, `${path}.required must be true when present`)
   if (Array.isArray(schema.type)) assert.fail(`${path}.type must be a single type string`)
-  if (schema.required !== undefined) assert.ok(Array.isArray(schema.required) && schema.required.every(name => typeof name === 'string'), `${path}.required must be an array of strings`)
   if (schema.oneOf !== undefined) {
+    assert.equal(schema.type, undefined, `${path} cannot declare both type and oneOf`)
     assert.ok(Array.isArray(schema.oneOf) && schema.oneOf.length >= 2, `${path}.oneOf must have at least two branches`)
-    schema.oneOf.forEach((branch, i) => assertSupportedJsonSchema(branch, `${path}.oneOf[${i}]`))
+    schema.oneOf.forEach((branch, i) => assertSupportedValueSchema(branch, `${path}.oneOf[${i}]`))
+  }
+  if (schema.type === 'object') {
+    assert.equal(typeof schema.additionalProperties, 'boolean', `${path}.additionalProperties must be explicitly true or false`)
   }
   if (schema.properties) {
-    for (const [key, child] of Object.entries(schema.properties)) assertSupportedJsonSchema(child, `${path}.properties.${key}`)
-    if (schema.required) for (const name of schema.required) assert.ok(Object.hasOwn(schema.properties, name), `${path}.required names undeclared property ${name}`)
+    assert.equal(schema.type, 'object', `${path}.properties requires type object`)
+    for (const [key, child] of Object.entries(schema.properties)) assertSupportedValueSchema(child, `${path}.properties.${key}`, true)
   }
-  if (schema.items) assertSupportedJsonSchema(schema.items, `${path}.items`)
+  if (schema.items) assertSupportedValueSchema(schema.items, `${path}.items`)
   return schema
 }
 const defineTool = definition => {
-  assertSupportedJsonSchema(definition.output.schema)
+  assertSupportedValueSchema(definition.output.schema)
+  assert.equal(definition.output.schema.required, undefined, 'output root must not declare required')
+  for (const [name, property] of Object.entries(definition.output.schema.properties ?? {})) {
+    assert.equal(property.required, true, `schema.properties.${name}.required must be true`)
+  }
   return definition
 }
 const options = { provider: 'test-provider', model: 'test-model', messages: [{ role: 'user', content: [{ type: 'text', text: 'hello' }] }] }
