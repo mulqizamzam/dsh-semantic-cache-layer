@@ -25,6 +25,7 @@ test('input validation rejects malformed vectors and non-string content', () => 
   assert.throws(() => cache.store('x', [1, Infinity], 'y'), /finite numbers/)
   assert.throws(() => cache.store(1, [1], 'y'), /prompt must be a string/)
   assert.equal(cache.lookup([NaN]).reason, 'invalid-embedding')
+  assert.equal(cache.stats().invalidLookups, 1)
 })
 
 test('evicts least-recently-used entries at capacity', () => {
@@ -48,4 +49,18 @@ test('expires entries after TTL and clear supports one namespace or all namespac
   assert.equal(cache.stats().expirations, 1)
   cache.store('c', [1, 1], 'C')
   assert.equal(cache.clear().cleared, 1)
+})
+
+test('zero TTL disables expiry, invalid lookups are counted, and same-key stores replace', () => {
+  let now = 0
+  const cache = new SemanticCache({ ttlMs: 0, now: () => now })
+  cache.store('a', [1, 0], 'A')
+  now = 1e9
+  assert.equal(cache.lookup([1, 0]).hit, true)
+  cache.lookup([])
+  cache.lookup([0, 0])
+  assert.equal(cache.stats().invalidLookups, 2)
+  cache.store('a', [1, 0], 'A2')
+  assert.equal(cache.stats().entries, 1)
+  assert.equal(cache.lookup([1, 0]).response, 'A2')
 })
