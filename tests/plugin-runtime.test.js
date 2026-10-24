@@ -160,6 +160,9 @@ test('URL policy accepts HTTPS and loopback HTTP only', () => {
   assert.equal(__test.isSafeEmbeddingUrl('http://api.example/v1/embeddings'), false)
   assert.equal(__test.isSafeEmbeddingUrl('https://user:pass@api.example/v1/embeddings'), false)
   assert.equal(__test.isSafeEmbeddingUrl('https://api.example/v1/embeddings?api_key=secret'), false)
+  assert.equal(__test.isSafeEmbeddingUrl('http://[::1]:3000/v1/embeddings'), true)
+  assert.equal(__test.isSafeEmbeddingUrl('https://api.example/v1/embeddings#fragment'), false)
+  assert.equal(__test.isSafeEmbeddingUrl('ftp://api.example/v1/embeddings'), false)
 })
 
 test('manual tools store, lookup, report stats, and require clear acknowledgement', async () => {
@@ -188,4 +191,36 @@ test('automatic cache partitions different generation settings and system prompt
   assert.notEqual(__test.automaticNamespace({ ...options, temperature: 0.5 }, config), baseline)
   assert.notEqual(__test.automaticNamespace({ ...options, system: 'another system prompt' }, config), baseline)
   assert.notEqual(__test.automaticNamespace({ ...options, model: 'other-model' }, config), baseline)
+})
+
+test('normalizeConfig enforces bounds, truncates counts, and rejects wrong types', () => {
+  const config = __test.normalizeConfig({})
+  assert.equal(config.threshold, 0.94)
+  assert.equal(config.maxEntries, 500)
+  assert.equal(config.ttlMs, 900000)
+  assert.equal(config.namespace, 'default')
+  assert.throws(() => __test.normalizeConfig({ threshold: 1.5 }), RangeError)
+  assert.equal(__test.normalizeConfig({ threshold: -1 }).threshold, -1)
+  assert.throws(() => __test.normalizeConfig({ maxEntries: 0.5 }), RangeError)
+  assert.equal(__test.normalizeConfig({ maxEntries: 7.9 }).maxEntries, 7)
+  assert.throws(() => __test.normalizeConfig({ ttlMs: -1 }), RangeError)
+  assert.equal(__test.normalizeConfig({ ttlMs: 0 }).ttlMs, 0)
+  assert.throws(() => __test.normalizeConfig({ embeddingEndpoint: 42 }), TypeError)
+})
+
+test('stream-shape invariants reject misplaced usage, late deltas, tool blocks, non-final finish and tool history', () => {
+  const start = validChunks[0]
+  const delta = validChunks[1]
+  const end = validChunks[2]
+  const finish = validChunks[3]
+  const usage = { type: 'usage', input: 1, output: 2 }
+  assert.equal(__test.extractCacheableText([start, delta, end, usage, finish]), 'hello world')
+  assert.equal(__test.extractCacheableText([start, delta, usage, end, finish]), null)
+  assert.equal(__test.extractCacheableText([start, delta, end, delta, finish]), null)
+  assert.equal(__test.extractCacheableText([start, delta, end, finish, usage]), null)
+  assert.equal(__test.extractCacheableText([{ type: 'block-start', index: 0, blockType: 'tool' }, finish]), null)
+  const config = { embeddingModel: 'x', maxInputChars: 99999 }
+  assert.equal(__test.canonicalRequest({ ...options, toolHistory: [] }, config), null)
+  assert.equal(__test.canonicalRequest({ model: 'test-model', messages: options.messages }, config), null)
+  assert.equal(__test.canonicalRequest({ ...options, messages: [{ role: 'user', content: 'plain' }] }, config), null)
 })
